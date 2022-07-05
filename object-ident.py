@@ -8,8 +8,8 @@ classFile = "/home/pati/Documents/Object_Detection_Files/coco.names"
 with open(classFile,"rt") as f:
     classNames = f.read().rstrip("\n").split("\n")
 
-configPath = "/home/pati/Documents/Object_Detection_Files/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
-weightsPath = "/home/pati/Documents/Object_Detection_Files/frozen_inference_graph.pb"
+configPath = "/Users/patriciarosa/Documents/tcc/detect-catd-and-dogs-service/object-ident.py/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
+weightsPath = "/Users/patriciarosa/Documents/tcc/detect-catd-and-dogs-service/object-ident.py/frozen_inference_graph.pb"
 
 net = cv2.dnn_DetectionModel(weightsPath,configPath)
 net.setInputSize(320,320)
@@ -48,15 +48,11 @@ if __name__ == "__main__":
     frame_height = int(cap.get(4))
     size = (frame_width, frame_height)
 
-    codec = cv2.VideoWriter_fourcc(*'JPEG')
+    codec = cv2.VideoWriter_fourcc('m','p','4','v')
     print(codec)
     
-    videoWriter = cv2.VideoWriter('captured8.mp4', codec, 15, size)
+    videoWriter = cv2.VideoWriter('captured7.avi', codec, 15, size)
     print(videoWriter)
-    # Dicionarios dos estados:
-    # 1 - inicio da filmagem
-    # 2 - gravando
-    # 3 - parou de gravar
 
     gravando = False
 
@@ -65,14 +61,13 @@ if __name__ == "__main__":
         result, objectInfo = getObjects(img,0.40,0.2, objects=['cat','dog' ])
         
         if objectInfo != [] :
-            print("gravando")
             gravando = True
             videoWriter.write(img)
             
         print(gravando)
 
         if objectInfo == [] and gravando == True :
-            print("Enviar post",gravando)
+            videoWriter.release()
             req = requests.post("http://192.168.18.2:8080/videos/upload",
                 files = { "foto": open("captured7.avi", "rb") }   
                 )
