@@ -1,15 +1,16 @@
 import cv2
+import numpy as np
 from datetime import datetime
 import requests
 #thres = 0.45 # Threshold to detect object
 
 classNames = []
-classFile = "/home/pati/Documents/Object_Detection_Files/coco.names"
+classFile = "/home/pati/Documentos/Object_Detection_Files/coco.names"
 with open(classFile,"rt") as f:
     classNames = f.read().rstrip("\n").split("\n")
 
-configPath = "/Users/patriciarosa/Documents/tcc/detect-catd-and-dogs-service/object-ident.py/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
-weightsPath = "/Users/patriciarosa/Documents/tcc/detect-catd-and-dogs-service/object-ident.py/frozen_inference_graph.pb"
+configPath = "/home/pati/Documentos/Object_Detection_Files/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
+weightsPath = "/home/pati/Documentos/Object_Detection_Files/frozen_inference_graph.pb"
 
 net = cv2.dnn_DetectionModel(weightsPath,configPath)
 net.setInputSize(320,320)
@@ -51,16 +52,18 @@ if __name__ == "__main__":
     codec = cv2.VideoWriter_fourcc('m','p','4','v')
     print(codec)
     
-    videoWriter = cv2.VideoWriter('captured7.avi', codec, 15, size)
-    print(videoWriter)
 
+    
     gravando = False
-
+        
     while True:
         success, img = cap.read()
-        result, objectInfo = getObjects(img,0.40,0.2, objects=['cat','dog' ])
+        print("Success",success)
+        result, objectInfo = getObjects(img,0.45,0.2, objects=['cat','dog'])
         
         if objectInfo != [] :
+            videoWriter = cv2.VideoWriter('captured8.mp4', codec, 5, size)
+            print("gravando")
             gravando = True
             videoWriter.write(img)
             
@@ -68,8 +71,9 @@ if __name__ == "__main__":
 
         if objectInfo == [] and gravando == True :
             videoWriter.release()
+            print("Enviar post")
             req = requests.post("http://192.168.18.2:8080/videos/upload",
-                files = { "foto": open("captured7.avi", "rb") }   
+                files = { "foto": open("captured8.mp4", "rb") }   
                 )
             gravando =  False
             print(gravando)
