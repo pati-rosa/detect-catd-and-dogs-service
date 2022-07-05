@@ -50,19 +50,19 @@ if __name__ == "__main__":
     size = (frame_width, frame_height)
 
     codec = cv2.VideoWriter_fourcc('m','p','4','v')
-    print(codec)
-    
-
     
     gravando = False
-        
+    
+
     while True:
         success, img = cap.read()
         print("Success",success)
         result, objectInfo = getObjects(img,0.45,0.2, objects=['cat','dog'])
         
-        if objectInfo != [] :
+        if objectInfo != [] and gravando == False:
             videoWriter = cv2.VideoWriter('captured8.mp4', codec, 5, size)
+
+        if objectInfo != [] :
             print("gravando")
             gravando = True
             videoWriter.write(img)
